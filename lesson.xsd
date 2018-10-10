@@ -2,7 +2,20 @@
     attributeFormDefault="unqualified"
     elementFormDefault="qualified"
     targetNamespace="lingquest.com/ns/lesson/v1/"
-    xmlns="http://www.w3.org/2001/XMLSchema">
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+    <import namespace="http://www.w3.org/1999/xhtml"
+        schemaLocation="http://www.w3.org/2002/08/xhtml/xhtml1-strict.xsd"/>
+
+
+        <complexType name="StyledText" mixed="true">
+            <complexContent>
+                <extension base="xhtml:Inline">
+                    <attributeGroup ref="xhtml:attrs"/>
+                </extension>
+            </complexContent>
+        </complexType>
 
     <simpleType name="nonEmptyToken">
         <restriction base="token">
@@ -49,14 +62,14 @@
     </complexType>
 
     <complexType name="Message">
-        <simpleContent>
-            <extension base="string">
+        <complexContent>
+            <extension base="l:StyledText">
                 <attribute
                     name="id"
                     type="l:nonEmptyToken"
                     use="required" />
             </extension>
-        </simpleContent>
+        </complexContent>
     </complexType>
 
     <complexType name="Question">
