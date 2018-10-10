@@ -1,0 +1,92 @@
+<schema xmlns:l="lingquest.com/ns/lesson/v1/"
+    attributeFormDefault="unqualified"
+    elementFormDefault="qualified"
+    targetNamespace="lingquest.com/ns/lesson/v1/"
+    xmlns="http://www.w3.org/2001/XMLSchema">
+
+    <simpleType name="nonEmptyToken">
+        <restriction base="token">
+            <minLength value="1" />
+        </restriction>
+    </simpleType>
+
+
+    <complexType name="Lesson">
+        <sequence
+            maxOccurs="unbounded"
+            minOccurs="1">
+            <choice>
+                <element
+                    name="message"
+                    type="l:Message">
+                    <key name="Mid">
+                        <selector xpath="message" />
+                        <field xpath="@id" />
+                    </key>
+                </element>
+                <element
+                    name="question"
+                    type="l:Question">
+                    <key name="Qid">
+                        <selector xpath="question" />
+                        <field xpath="@id" />
+                    </key>
+                </element>
+            </choice>
+        </sequence>
+        <attribute
+            name="seq"
+            type="integer"
+            use="required" />
+        <attribute
+            name="from"
+            type="string"
+            use="required" />
+        <attribute
+            name="to"
+            type="string"
+            use="required" />
+    </complexType>
+
+    <complexType name="Message">
+        <simpleContent>
+            <extension base="string">
+                <attribute
+                    name="id"
+                    type="l:nonEmptyToken"
+                    use="required" />
+            </extension>
+        </simpleContent>
+    </complexType>
+
+    <complexType name="Question">
+        <sequence>
+            <element
+                name="text"
+                type="string" />
+            <element
+                name="answer"
+                maxOccurs="unbounded"
+                minOccurs="1"
+                type="l:Answer" />
+        </sequence>
+        <attribute
+            name="id"
+            type="l:nonEmptyToken"
+            use="required" />
+    </complexType>
+
+    <complexType name="Answer">
+        <attribute
+            name="text"
+            type="string"
+            use="required" />
+        <attribute
+            name="message"
+            type="string" />
+    </complexType>
+
+    <element
+        name="lesson"
+        type="l:Lesson" />
+</schema>
