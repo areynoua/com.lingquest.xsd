@@ -1,92 +1,150 @@
 <schema xmlns:l="lingquest.com/ns/lesson/v1/"
-    attributeFormDefault="unqualified"
-    elementFormDefault="qualified"
-    targetNamespace="lingquest.com/ns/lesson/v1/"
-    xmlns="http://www.w3.org/2001/XMLSchema">
+  attributeFormDefault="unqualified"
+  elementFormDefault="qualified"
+  targetNamespace="lingquest.com/ns/lesson/v1/"
+  xmlns="http://www.w3.org/2001/XMLSchema">
 
-    <simpleType name="nonEmptyToken">
-        <restriction base="token">
-            <minLength value="1" />
-        </restriction>
-    </simpleType>
+  <complexType name="Empty" />
+
+  <simpleType name="nonEmptyToken">
+    <restriction base="token">
+      <minLength value="1" />
+    </restriction>
+  </simpleType>
+
+  <simpleType name="Orientation">
+    <restriction base="string">
+      <enumeration value="business" />
+      <enumeration value="tourism" />
+      <enumeration value="general" />
+    </restriction>
+  </simpleType>
+
+  <attributeGroup name="stepAttributeGroup">
+    <attribute
+      name="id"
+      type="l:nonEmptyToken"
+      use="required" />
+    <attribute
+      name="orientation"
+      type="l:Orientation" />
+  </attributeGroup>
 
 
-    <complexType name="Lesson">
-        <sequence
-            maxOccurs="unbounded"
-            minOccurs="1">
-            <choice>
-                <element
-                    name="message"
-                    type="l:Message">
-                    <key name="Mid">
-                        <selector xpath="message" />
-                        <field xpath="@id" />
-                    </key>
-                </element>
-                <element
-                    name="question"
-                    type="l:Question">
-                    <key name="Qid">
-                        <selector xpath="question" />
-                        <field xpath="@id" />
-                    </key>
-                </element>
-            </choice>
-        </sequence>
-        <attribute
-            name="seq"
-            type="integer"
-            use="required" />
-        <attribute
-            name="from"
-            type="string"
-            use="required" />
-        <attribute
-            name="to"
-            type="string"
-            use="required" />
-    </complexType>
+  <complexType name="Lesson">
+    <sequence
+      maxOccurs="unbounded"
+      minOccurs="1">
+      <choice>
+        <element
+          name="message"
+          type="l:Message" />
+        <element
+          name="question"
+          type="l:Question" />
+        <element
+          name="fillIn"
+          type="l:FillIn" />
+        <element
+          name="beaver"
+          type="l:Beaver" />
+      </choice>
+    </sequence>
+    <attribute
+      name="seq"
+      type="integer"
+      use="required" />
+    <attribute
+      name="from"
+      type="string"
+      use="required" />
+    <attribute
+      name="to"
+      type="string"
+      use="required" />
+  </complexType>
 
-    <complexType name="Message">
-        <simpleContent>
-            <extension base="string">
-                <attribute
-                    name="id"
-                    type="l:nonEmptyToken"
-                    use="required" />
-            </extension>
-        </simpleContent>
-    </complexType>
+  <complexType name="Message" mixed="true">
+    <choice minOccurs="0" maxOccurs="unbounded">
+      <element name="br" type="l:Empty" />
+      <element name="dfn" type="string" />
+      <element name="i" type="string" />
+    </choice>
+    <attributeGroup ref="l:stepAttributeGroup" />
+    <attribute
+      name="goto"
+      type="l:nonEmptyToken" />
+  </complexType>
 
-    <complexType name="Question">
-        <sequence>
-            <element
-                name="text"
-                type="string" />
-            <element
-                name="answer"
-                maxOccurs="unbounded"
-                minOccurs="1"
-                type="l:Answer" />
-        </sequence>
-        <attribute
-            name="id"
-            type="l:nonEmptyToken"
-            use="required" />
-    </complexType>
+  <complexType name="Question">
+    <sequence>
+      <element
+        name="text"
+        type="string" />
+      <element
+        name="answer"
+        maxOccurs="unbounded"
+        type="l:Answer" />
+    </sequence>
+    <attributeGroup ref="l:stepAttributeGroup" />
+  </complexType>
 
-    <complexType name="Answer">
-        <attribute
-            name="text"
-            type="string"
-            use="required" />
-        <attribute
-            name="message"
-            type="string" />
-    </complexType>
+  <complexType name="FillIn" mixed="true">
+    <choice minOccurs="0" maxOccurs="unbounded">
+      <element name="br" type="l:Empty" />
+      <element name="gap" type="string" />
+    </choice>
+    <attributeGroup ref="l:stepAttributeGroup" />
+    <attribute
+      name="goto"
+      type="l:nonEmptyToken" />
+  </complexType>
 
-    <element
-        name="lesson"
-        type="l:Lesson" />
+  <complexType name="Beaver">
+    <sequence>
+      <element name="text" type="string" />
+      <element
+        name="answer"
+        maxOccurs="unbounded"
+        type="string" />
+    </sequence>
+    <attributeGroup ref="l:stepAttributeGroup" />
+    <attribute
+      name="goto"
+      type="l:nonEmptyToken" />
+  </complexType>
+
+  <complexType name="Answer">
+    <attribute
+      name="text"
+      type="string" />
+    <attribute
+      name="message"
+      type="string" />
+    <attribute
+      name="goto"
+      type="l:nonEmptyToken" />
+    <attribute
+      name="correct"
+      type="boolean"
+      default="true" />
+  </complexType>
+
+
+  <element
+    name="lesson"
+    type="l:Lesson">
+
+    <key name="id">
+      <selector xpath="*" />
+      <field xpath="@id" />
+    </key>
+
+    <keyref name="goto" refer="l:id">
+      <selector xpath="*|l:question/l:answer" />
+      <field xpath="@goto" />
+    </keyref>
+
+  </element>
+
 </schema>
